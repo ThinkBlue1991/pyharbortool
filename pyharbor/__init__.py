@@ -1,3 +1,2 @@
-from harbor_client import HarborClient
+from pyharbor.harbor_client import HarborClient
 
-name = 'pyharbortools'

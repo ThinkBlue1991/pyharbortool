@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pyharbortool",
+    name="pyharborsdk",
     version="0.1",
     author="zhangjx",
     author_email="1075495029@qq.com",
