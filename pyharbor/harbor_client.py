@@ -13,17 +13,17 @@ class HarborClient(object):
     def _login(self):
         try:
             if self._protocol == "https":
-                login_data = requests.post("{0}://{1}/c/login".format
-                                           (self._protocol, self._host),
-                                           data={'principal': self._user,
-                                                 'password': self._password})
+                info = requests.post("{0}://{1}/c/login".format
+                                     (self._protocol, self._host),
+                                     data={'principal': self._user,
+                                           'password': self._password})
             else:
-                login_data = requests.post("{0}://{1}/login".format
-                                           (self._protocol, self._host),
-                                           data={'principal': self._user,
-                                                 'password': self._password})
-            if login_data.status_code == 200:
-                session_id = login_data.cookies.get('sid')
+                info = requests.post("{0}://{1}/login".format
+                                     (self._protocol, self._host),
+                                     data={'principal': self._user,
+                                           'password': self._password})
+            if info.status_code == 200:
+                session_id = info.cookies.get('sid')
                 return session_id
             else:
                 return None
