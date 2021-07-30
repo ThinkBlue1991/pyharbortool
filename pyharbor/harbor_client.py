@@ -70,6 +70,20 @@ class HarborClient(object):
     def protocol(self, protocol: str):
         self._protocol = protocol
 
+    def _get_request(self, url):
+        try:
+            response = requests.get(url, cookies={'sid': self._session_id})
+
+            if response.status_code == 200:
+                flag = response.json()
+            else:
+                flag = None
+            return flag
+
+        except Exception as ex:
+            print(ex)
+            return None
+
     def delete_repository(self, repo_name, tag='latest'):
         try:
             url = "{0}/repositories/{1}/tags/{2}".format(
@@ -86,142 +100,56 @@ class HarborClient(object):
             return False
 
     def get_projects(self, page, page_size):
-        try:
-            url = "{0}/projects?page={1}&page_size={2}".format(
-                self._base_path, page, page_size)
+        url = "{0}/projects?page={1}&page_size={2}".format(
+            self._base_path, page, page_size)
 
-            response = requests.get(url, cookies={'sid': self._session_id})
-
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = None
-            return flag
-
-        except Exception as ex:
-            print(ex)
-            return None
+        return self._get_request(url)
 
     def get_repositories_by_project_id(self, page, page_size, project_id):
-        try:
-            url = "{0}/repositories?page={1}&page_size={2}&project_id={3}".format(
-                self._base_path, page, page_size, project_id)
+        url = "{0}/repositories?page={1}&page_size={2}&project_id={3}".format(
+            self._base_path, page, page_size, project_id)
 
-            response = requests.get(url, cookies={'sid': self._session_id})
-
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = None
-            return flag
-
-        except Exception as ex:
-            print(ex)
-            return None
+        return self._get_request(url)
 
     def get_repository_info(self, project_id, repo_name):
-        try:
-            url = "{0}/repositories?project_id={1}&q={2}".format(
-                self._base_path, project_id, repo_name)
+        url = "{0}/repositories?project_id={1}&q={2}".format(
+            self._base_path, project_id, repo_name)
 
-            response = requests.get(url, cookies={'sid': self._session_id})
-
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = None
-            return flag
-
-        except Exception as ex:
-            print(ex)
-            return None
+        return self._get_request(url)
 
     def get_tags(self, repo_name, detail=1):
-        try:
-            url = "{0}/repositories/{1}/tags?detail={2}".format(
-                self._base_path, repo_name, detail)
+        url = "{0}/repositories/{1}/tags?detail={2}".format(
+            self._base_path, repo_name, detail)
 
-            response = requests.get(url, cookies={'sid': self._session_id})
-
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = None
-            return flag
-
-        except Exception as ex:
-            print(ex)
-            return None
+        return self._get_request(url)
 
     def get_tag_info(self, repo_name, tag):
-        try:
-            url = "{0}/repositories/{1}/tags/{2}".format(
-                self._base_path, repo_name, tag)
+        url = "{0}/repositories/{1}/tags/{2}".format(
+            self._base_path, repo_name, tag)
 
-            response = requests.get(url, cookies={'sid': self._session_id})
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = None
-            return flag
-        except Exception as ex:
-            print(ex)
-            return None
+        return self._get_request(url)
 
     def get_manifest(self, repo_name, tag):
-        try:
-            url = "{0}/repositories/{1}/tags/{2}/manifest".format(
-                self._base_path, repo_name, tag)
+        url = "{0}/repositories/{1}/tags/{2}/manifest".format(
+            self._base_path, repo_name, tag)
 
-            response = requests.get(url, cookies={'sid': self._session_id})
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = None
-            return flag
-        except Exception as ex:
-            print(ex)
-            return None
+        return self._get_request(url)
 
     def get_users(self):
-        try:
-            url = "{0}/users".format(self._base_path)
-            response = requests.get(url, cookies={'sid': self._session_id})
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = None
-            return flag
-        except Exception as ex:
-            print(ex)
-            return None
+        url = "{0}/users".format(self._base_path)
+
+        return self._get_request(url)
 
     def get_logs(self, page, page_size):
-        try:
-            url = "{0}/logs?page={1}&page_size={2}".format(
-                self._base_path, page, page_size)
-            response = requests.get(url, cookies={'sid': self._session_id})
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = False
-            return flag
-        except Exception as ex:
-            print(ex)
-            return False
+        url = "{0}/logs?page={1}&page_size={2}".format(
+            self._base_path, page, page_size)
+
+        return self._get_request(url)
 
     def get_statistics(self):
-        try:
-            url = "{0}/statistics".format(self._base_path)
-            response = requests.get(url, cookies={'sid': self._session_id})
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = False
-            return flag
-        except Exception as ex:
-            print(ex)
-            return False
+        url = "{0}/statistics".format(self._base_path)
+
+        return self._get_request(url)
 
     def create_project(self, project_info: dict):
         try:
