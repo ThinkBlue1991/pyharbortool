@@ -99,15 +99,20 @@ class HarborClient(object):
             print(ex)
             return False
 
-    def get_projects(self, page, page_size):
-        url = "{0}/projects?page={1}&page_size={2}".format(
-            self._base_path, page, page_size)
+    def get_projects(self):
+        url = "{0}/projects".format(self._base_path)
 
         return self._get_request(url)
 
-    def get_repositories_by_project_id(self, page, page_size, project_id):
-        url = "{0}/repositories?page={1}&page_size={2}&project_id={3}".format(
-            self._base_path, page, page_size, project_id)
+    def get_repositories(self, project_name):
+        url = "{0}/projects/{1}/repositories".format(
+                self._base_path, project_name)
+
+        return self._get_request(url)
+
+    def get_artefacts(self, project_name, repository_name):
+        url = "{0}/projects/{1}/repositories{2}/artifacts".format(
+                self._base_path, project_name, repository_name)
 
         return self._get_request(url)
 
