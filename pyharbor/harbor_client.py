@@ -2,11 +2,12 @@ import requests
 
 
 class HarborClient(object):
-    def __init__(self, host, user, password, protocol="http"):
+    def __init__(self, host, user, password, protocol="http", api_path="api"):
         self._host = host
         self._user = user
         self._password = password
         self._protocol = protocol
+        self._base_path = "{0}://{1}/{2}".format(protocol, host, api_path)
 
         self._session_id = self._login()
 
@@ -69,13 +70,25 @@ class HarborClient(object):
     def protocol(self, protocol: str):
         self._protocol = protocol
 
+    def _get_request(self, url):
+        try:
+            response = requests.get(url, cookies={'sid': self._session_id})
+
+            if response.status_code == 200:
+                flag = response.json()
+            else:
+                flag = None
+            return flag
+
+        except Exception as ex:
+            print(ex)
+            return None
+
     def delete_repository(self, repo_name, tag='latest'):
         try:
-            url = "{0}://{1}/api/repositories/{2}/tags/{3}".format(
-                self._protocol,
-                self._host,
-                repo_name,
-                tag)
+            url = "{0}/repositories/{1}/tags/{2}".format(
+                self._base_path, repo_name, tag)
+
             response = requests.delete(url, cookies={'sid': self._session_id})
             if response.status_code == 200:
                 flag = True
@@ -86,151 +99,66 @@ class HarborClient(object):
             print(ex)
             return False
 
-    def get_projects(self, page, page_size):
-        try:
-            url = "{0}://{1}/api/projects?page={2}&page_size={3}".format(
-                self._protocol, self._host, page, page_size)
+    def get_projects(self):
+        url = "{0}/projects".format(self._base_path)
 
-            response = requests.get(url, cookies={'sid': self._session_id})
+        return self._get_request(url)
 
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = None
-            return flag
+    def get_repositories(self, project_name):
+        url = "{0}/projects/{1}/repositories".format(
+                self._base_path, project_name)
 
-        except Exception as ex:
-            print(ex)
-            return None
+        return self._get_request(url)
 
-    def get_repositories_by_project_id(self, page, page_size, project_id):
-        try:
-            url = "{0}://{1}/api/repositories?page={2}&page_size={3}&project_id={4}".format(
-                self._protocol, self._host, page, page_size, project_id)
+    def get_artefacts(self, project_name, repository_name):
+        url = "{0}/projects/{1}/repositories{2}/artifacts".format(
+                self._base_path, project_name, repository_name)
 
-            response = requests.get(url, cookies={'sid': self._session_id})
-
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = None
-            return flag
-
-        except Exception as ex:
-            print(ex)
-            return None
+        return self._get_request(url)
 
     def get_repository_info(self, project_id, repo_name):
-        try:
-            url = "{0}://{1}/api/repositories?project_id={2}&q={3}".format(
-                self._protocol, self._host, project_id, repo_name)
+        url = "{0}/repositories?project_id={1}&q={2}".format(
+            self._base_path, project_id, repo_name)
 
-            response = requests.get(url, cookies={'sid': self._session_id})
-
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = None
-            return flag
-
-        except Exception as ex:
-            print(ex)
-            return None
+        return self._get_request(url)
 
     def get_tags(self, repo_name, detail=1):
-        try:
-            url = "{0}://{1}/api/repositories/{2}/tags?detail={3}".format(
-                self._protocol, self._host, repo_name, detail)
+        url = "{0}/repositories/{1}/tags?detail={2}".format(
+            self._base_path, repo_name, detail)
 
-            response = requests.get(url, cookies={'sid': self._session_id})
-
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = None
-            return flag
-
-        except Exception as ex:
-            print(ex)
-            return None
+        return self._get_request(url)
 
     def get_tag_info(self, repo_name, tag):
-        try:
-            url = "{0}://{1}/api/repositories/{2}/tags/{3}".format(
-                self._protocol,
-                self._host,
-                repo_name,
-                tag)
-            response = requests.get(url, cookies={'sid': self._session_id})
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = None
-            return flag
-        except Exception as ex:
-            print(ex)
-            return None
+        url = "{0}/repositories/{1}/tags/{2}".format(
+            self._base_path, repo_name, tag)
+
+        return self._get_request(url)
 
     def get_manifest(self, repo_name, tag):
-        try:
-            url = "{0}://{1}/api/repositories/{2}/tags/{3}/manifest".format(
-                self._protocol,
-                self._host,
-                repo_name,
-                tag)
-            response = requests.get(url, cookies={'sid': self._session_id})
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = None
-            return flag
-        except Exception as ex:
-            print(ex)
-            return None
+        url = "{0}/repositories/{1}/tags/{2}/manifest".format(
+            self._base_path, repo_name, tag)
+
+        return self._get_request(url)
 
     def get_users(self):
-        try:
-            url = "{0}://{1}/api/users".format(self._protocol, self._host)
-            response = requests.get(url, cookies={'sid': self._session_id})
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = None
-            return flag
-        except Exception as ex:
-            print(ex)
-            return None
+        url = "{0}/users".format(self._base_path)
+
+        return self._get_request(url)
 
     def get_logs(self, page, page_size):
-        try:
-            url = "{0}://{1}/api/logs?page={2}&page_size={3}".format(
-                self._protocol, self._host, page, page_size)
-            response = requests.get(url, cookies={'sid': self._session_id})
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = False
-            return flag
-        except Exception as ex:
-            print(ex)
-            return False
+        url = "{0}/logs?page={1}&page_size={2}".format(
+            self._base_path, page, page_size)
+
+        return self._get_request(url)
 
     def get_statistics(self):
-        try:
-            url = "{0}://{1}/api/statistics".format(self._protocol, self._host)
-            response = requests.get(url, cookies={'sid': self._session_id})
-            if response.status_code == 200:
-                flag = response.json()
-            else:
-                flag = False
-            return flag
-        except Exception as ex:
-            print(ex)
-            return False
+        url = "{0}/statistics".format(self._base_path)
+
+        return self._get_request(url)
 
     def create_project(self, project_info: dict):
         try:
-            url = "{0}://{1}/api/projects".format(self._protocol, self._host)
+            url = "{0}/projects".format(self._base_path)
             response = requests.post(url, json=project_info,
                                      cookies={'sid': self._session_id})
 
@@ -245,8 +173,7 @@ class HarborClient(object):
 
     def delete_project(self, project_id: int):
         try:
-            url = "{0}://{1}/api/projects/{2}".format(self._protocol,
-                                                      self._host, project_id)
+            url = "{0}/projects/{1}".format(self._base_path, project_id)
             response = requests.delete(url, cookies={'sid': self._session_id})
             if response.status_code == 200:
                 flag = True
